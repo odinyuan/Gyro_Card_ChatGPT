@@ -6,105 +6,142 @@
   <title>Gyro Holographic Card</title>
   <style>
     :root {
-      --rx: 0deg;
-      --ry: 0deg;
-      --bgx: 0px;
-      --bgy: 0px;
-      --fgx: 0px;
-      --fgy: 0px;
-      --gx: 50%;
-      --gy: 50%;
+      --card-rx: 0deg;
+      --card-ry: 0deg;
+      --view-x: 0px;
+      --view-y: 0px;
+      --light-x: 50%;
+      --light-y: 50%;
       --foil-x: 50%;
       --foil-y: 50%;
-      --shine: .58;
+      --shine: .55;
     }
     * { box-sizing: border-box; }
     html, body {
-      width: 100%; height: 100%; margin: 0;
-      overflow: hidden;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      width: 100%; height: 100%; margin: 0; overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       color: white;
-      background: radial-gradient(circle at 50% 20%, #262626 0%, #101010 40%, #050505 100%);
+      background: radial-gradient(circle at 50% 18%, #262626 0%, #101010 40%, #050505 100%);
     }
     .stage {
       width: 100%; height: 100%; display: grid; place-items: center;
-      perspective: 1300px; padding: 20px;
+      perspective: 1400px; padding: 20px;
     }
-    .wrap { width: min(80vw, 392px); aspect-ratio: 3/4; position: relative; }
+    .wrap { width: min(80vw, 392px); aspect-ratio: 3 / 4; position: relative; }
     .card {
-      position: absolute; inset: 0; border-radius: 24px; overflow: visible;
+      position: absolute; inset: 0;
       transform-style: preserve-3d;
-      transform: rotateX(var(--rx)) rotateY(var(--ry));
-      transition: transform 60ms linear;
-      filter: drop-shadow(0 34px 65px rgba(0,0,0,.52));
+      transform: rotateX(var(--card-rx)) rotateY(var(--card-ry));
+      transition: transform 50ms linear;
+      filter: drop-shadow(0 32px 70px rgba(0,0,0,.55));
     }
+    .clip {
+      position: absolute; inset: 0; border-radius: 24px; overflow: hidden;
+      transform-style: preserve-3d;
+      background: #111;
+      isolation: isolate;
+    }
+
     .layer {
-      position: absolute; inset: 0; background-size: cover; background-position: center;
-      border-radius: 24px; pointer-events: none;
-      will-change: transform, opacity, background-position;
+      position: absolute;
+      inset: -5%;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      pointer-events: none;
+      will-change: transform;
+      transform-origin: center center;
     }
-    .shadow { background-image: url('assets/shadow.png'); transform: translate3d(calc(var(--fgx) * .25), calc(var(--fgy) * .25), -12px) scale(1.02); filter: blur(2px); opacity: .55; }
-    .bg { background-image: url('assets/background.png'); transform: translate3d(var(--bgx), var(--bgy), 0px) scale(1.015); }
-    .creature { background-image: url('assets/creature.png'); transform: translate3d(var(--fgx), var(--fgy), 18px) scale(1.03); }
-    .frame { background-image: url('assets/frame.png'); transform: translateZ(38px); }
+
+    /* All layers are driven by the same view vector; only depth factors differ */
+    .shadow {
+      background-image: url('assets/shadow.png');
+      transform: translate3d(calc(var(--view-x) * 0.22), calc(var(--view-y) * 0.22), -18px) scale(1.06);
+      opacity: .34;
+      filter: blur(5px);
+    }
+    .bg {
+      background-image: url('assets/background.png');
+      transform: translate3d(calc(var(--view-x) * -0.18), calc(var(--view-y) * -0.18), 0px) scale(1.10);
+    }
+    .mid {
+      background-image: url('assets/card-full.png');
+      transform: translate3d(calc(var(--view-x) * -0.05), calc(var(--view-y) * -0.05), 8px) scale(1.04);
+      opacity: .18;
+      mix-blend-mode: normal;
+    }
+    .creature {
+      background-image: url('assets/creature.png');
+      transform: translate3d(calc(var(--view-x) * 0.34), calc(var(--view-y) * 0.34), 26px) scale(1.10);
+    }
+    .frame {
+      background-image: url('assets/frame.png');
+      transform: translate3d(calc(var(--view-x) * 0.10), calc(var(--view-y) * 0.10), 40px) scale(1.05);
+    }
 
     .foil-a, .foil-b, .glare, .sparkle, .edge {
-      position: absolute; inset: 0; border-radius: 24px; pointer-events: none;
+      position: absolute; inset: 0; pointer-events: none; border-radius: 24px;
+      will-change: transform, opacity, background-position;
     }
     .foil-a {
-      inset: -20%;
-      mix-blend-mode: color-dodge; opacity: var(--shine);
+      inset: -18%;
+      mix-blend-mode: color-dodge;
+      opacity: var(--shine);
       background:
         linear-gradient(115deg,
-          transparent 15%,
-          rgba(255, 70, 130, .32) 28%,
-          rgba(255, 214, 90, .36) 38%,
-          rgba(100, 255, 215, .42) 48%,
-          rgba(70, 175, 255, .46) 58%,
-          rgba(180, 80, 255, .40) 68%,
-          transparent 80%);
+          transparent 14%,
+          rgba(255, 70, 130, .28) 26%,
+          rgba(255, 214, 90, .34) 37%,
+          rgba(100, 255, 215, .40) 48%,
+          rgba(70, 175, 255, .44) 58%,
+          rgba(180, 80, 255, .38) 68%,
+          transparent 82%);
       background-size: 170% 170%;
       background-position: var(--foil-x) var(--foil-y);
-      transform: translateZ(22px) rotate(2deg);
+      transform: translate3d(calc(var(--view-x) * 0.16), calc(var(--view-y) * 0.16), 30px) rotate(2deg);
       filter: saturate(1.25);
     }
     .foil-b {
-      mix-blend-mode: soft-light; opacity: .46;
+      mix-blend-mode: soft-light;
+      opacity: .42;
       background:
-        radial-gradient(circle at calc(var(--gx) * .8) calc(var(--gy) * .8), rgba(255,255,255,.16), transparent 35%),
-        conic-gradient(from 120deg at var(--gx) var(--gy),
-          rgba(255, 0, 128, .15), rgba(255, 215, 0, .15), rgba(0,255,255,.14), rgba(110,110,255,.15), rgba(255,0,128,.15));
-      transform: translateZ(24px);
+        radial-gradient(circle at calc(var(--light-x) * .8) calc(var(--light-y) * .8), rgba(255,255,255,.14), transparent 34%),
+        conic-gradient(from 120deg at var(--light-x) var(--light-y),
+          rgba(255, 0, 128, .14), rgba(255, 215, 0, .14), rgba(0,255,255,.13), rgba(110,110,255,.14), rgba(255,0,128,.14));
+      transform: translate3d(calc(var(--view-x) * 0.10), calc(var(--view-y) * 0.10), 32px);
     }
     .glare {
       mix-blend-mode: screen;
-      background: radial-gradient(circle at var(--gx) var(--gy), rgba(255,255,255,.96) 0%, rgba(255,255,255,.45) 8%, rgba(145,220,255,.22) 20%, rgba(255,255,255,0) 42%);
-      opacity: .95; transform: translateZ(28px);
+      background: radial-gradient(circle at var(--light-x) var(--light-y), rgba(255,255,255,.96) 0%, rgba(255,255,255,.44) 8%, rgba(145,220,255,.20) 18%, rgba(255,255,255,0) 40%);
+      opacity: .92;
+      transform: translate3d(calc(var(--view-x) * 0.18), calc(var(--view-y) * 0.18), 36px);
     }
     .sparkle {
-      mix-blend-mode: screen; opacity: .34; transform: translateZ(26px);
+      mix-blend-mode: screen;
+      opacity: .28;
       background-image:
-        repeating-linear-gradient(35deg, rgba(255,255,255,.12) 0 1px, transparent 1px 7px),
-        repeating-linear-gradient(145deg, rgba(130,190,255,.10) 0 1px, transparent 1px 9px),
-        radial-gradient(circle at 20% 30%, rgba(255,255,255,.25) 0 1px, transparent 1.5px),
-        radial-gradient(circle at 70% 60%, rgba(255,230,140,.18) 0 1px, transparent 1.5px),
-        radial-gradient(circle at 40% 80%, rgba(120,255,255,.18) 0 1px, transparent 1.5px);
+        repeating-linear-gradient(35deg, rgba(255,255,255,.11) 0 1px, transparent 1px 7px),
+        repeating-linear-gradient(145deg, rgba(130,190,255,.09) 0 1px, transparent 1px 9px),
+        radial-gradient(circle at 20% 30%, rgba(255,255,255,.20) 0 1px, transparent 1.6px),
+        radial-gradient(circle at 70% 60%, rgba(255,230,140,.16) 0 1px, transparent 1.6px),
+        radial-gradient(circle at 40% 80%, rgba(120,255,255,.16) 0 1px, transparent 1.6px);
       background-position:
-        calc(var(--gx) * .2) calc(var(--gy) * .2),
-        calc(var(--gx) * -.14) calc(var(--gy) * -.14),
+        calc(var(--light-x) * .18) calc(var(--light-y) * .18),
+        calc(var(--light-x) * -.12) calc(var(--light-y) * -.12),
         0 0, 0 0, 0 0;
+      transform: translate3d(calc(var(--view-x) * 0.14), calc(var(--view-y) * 0.14), 34px);
     }
     .edge {
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,.32), inset 0 0 18px rgba(255,255,255,.08);
-      transform: translateZ(40px);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.34), inset 0 0 18px rgba(255,255,255,.08);
+      transform: translateZ(44px);
     }
 
     .hud {
       position: fixed; left: 50%; bottom: max(18px, env(safe-area-inset-bottom)); transform: translateX(-50%);
       display: flex; gap: 10px; align-items: center;
       padding: 10px 14px; border-radius: 999px;
-      background: rgba(0,0,0,.56); backdrop-filter: blur(12px); color: rgba(255,255,255,.94);
-      font-size: 13px; white-space: nowrap;
+      background: rgba(0,0,0,.56); backdrop-filter: blur(12px);
+      color: rgba(255,255,255,.94); font-size: 13px; white-space: nowrap;
       box-shadow: 0 8px 24px rgba(0,0,0,.28);
     }
     button {
@@ -117,15 +154,18 @@
   <div class="stage">
     <div class="wrap">
       <div class="card" id="card">
-        <div class="layer shadow"></div>
-        <div class="layer bg"></div>
-        <div class="foil-a"></div>
-        <div class="layer creature"></div>
-        <div class="foil-b"></div>
-        <div class="sparkle"></div>
-        <div class="glare"></div>
-        <div class="layer frame"></div>
-        <div class="edge"></div>
+        <div class="clip">
+          <div class="layer shadow"></div>
+          <div class="layer bg"></div>
+          <div class="layer mid"></div>
+          <div class="foil-a"></div>
+          <div class="layer creature"></div>
+          <div class="foil-b"></div>
+          <div class="sparkle"></div>
+          <div class="glare"></div>
+          <div class="layer frame"></div>
+          <div class="edge"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -140,49 +180,48 @@
     const statusEl = document.getElementById('status');
     const enableBtn = document.getElementById('enable');
 
-    const state = { beta: 45, gamma: 0 };
+    const target = { beta: 45, gamma: 0 };
+    const current = { beta: 45, gamma: 0 };
 
     function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
     function lerp(a, b, t) { return a + (b - a) * t; }
 
-    let target = { beta: 45, gamma: 0 };
-    let current = { beta: 45, gamma: 0 };
-
     function apply(beta, gamma) {
-      const g = clamp(gamma, -35, 35);
-      const b = clamp(beta - 45, -35, 35);
+      const g = clamp(gamma, -32, 32);
+      const b = clamp(beta - 45, -32, 32);
 
-      const ry = g * 0.42;
-      const rx = -b * 0.34;
-      const x = 50 + (g / 35) * 45;
-      const y = 50 + (b / 35) * 45;
-      const fx = 50 + (g / 35) * 62;
-      const fy = 50 + (b / 35) * 62;
+      // overall card tilt
+      const ry = g * 0.46;
+      const rx = -b * 0.36;
 
-      const bgx = (-g * 0.12).toFixed(1) + 'px';
-      const bgy = (-b * 0.10).toFixed(1) + 'px';
-      const fgx = ( g * 0.24).toFixed(1) + 'px';
-      const fgy = ( b * 0.18).toFixed(1) + 'px';
+      // unified view vector for all inner layers
+      const vx = (g * 0.85).toFixed(2) + 'px';
+      const vy = (b * 0.78).toFixed(2) + 'px';
 
-      root.style.setProperty('--ry', ry.toFixed(2) + 'deg');
-      root.style.setProperty('--rx', rx.toFixed(2) + 'deg');
-      root.style.setProperty('--gx', x.toFixed(2) + '%');
-      root.style.setProperty('--gy', y.toFixed(2) + '%');
+      // light / foil follows same orientation but exaggerated a little
+      const lx = 50 + (g / 32) * 40;
+      const ly = 50 + (b / 32) * 40;
+      const fx = 50 + (g / 32) * 55;
+      const fy = 50 + (b / 32) * 55;
+
+      root.style.setProperty('--card-ry', ry.toFixed(2) + 'deg');
+      root.style.setProperty('--card-rx', rx.toFixed(2) + 'deg');
+      root.style.setProperty('--view-x', vx);
+      root.style.setProperty('--view-y', vy);
+      root.style.setProperty('--light-x', lx.toFixed(2) + '%');
+      root.style.setProperty('--light-y', ly.toFixed(2) + '%');
       root.style.setProperty('--foil-x', fx.toFixed(2) + '%');
       root.style.setProperty('--foil-y', fy.toFixed(2) + '%');
-      root.style.setProperty('--bgx', bgx);
-      root.style.setProperty('--bgy', bgy);
-      root.style.setProperty('--fgx', fgx);
-      root.style.setProperty('--fgy', fgy);
 
-      const intensity = 0.45 + Math.min(0.42, (Math.abs(g) + Math.abs(b)) / 120);
+      const intensity = 0.42 + Math.min(0.34, (Math.abs(g) + Math.abs(b)) / 120);
       root.style.setProperty('--shine', intensity.toFixed(2));
+
       statusEl.textContent = `β ${beta.toFixed(1)}°  γ ${gamma.toFixed(1)}°`;
     }
 
     function tick() {
-      current.beta = lerp(current.beta, target.beta, 0.16);
-      current.gamma = lerp(current.gamma, target.gamma, 0.16);
+      current.beta = lerp(current.beta, target.beta, 0.14);
+      current.gamma = lerp(current.gamma, target.gamma, 0.14);
       apply(current.beta, current.gamma);
       requestAnimationFrame(tick);
     }
@@ -220,13 +259,15 @@
     function pointerFallback(clientX, clientY) {
       const nx = (clientX / innerWidth - 0.5) * 2;
       const ny = (clientY / innerHeight - 0.5) * 2;
-      target.gamma = nx * 28;
-      target.beta = 45 + ny * 28;
+      target.gamma = nx * 26;
+      target.beta = 45 + ny * 26;
     }
+
     window.addEventListener('mousemove', e => pointerFallback(e.clientX, e.clientY));
     window.addEventListener('touchmove', e => {
-      const t = e.touches[0]; if (t) pointerFallback(t.clientX, t.clientY);
-    }, {passive: true});
+      const t = e.touches[0];
+      if (t) pointerFallback(t.clientX, t.clientY);
+    }, { passive: true });
   </script>
 </body>
 </html>
